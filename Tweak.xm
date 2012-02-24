@@ -19,7 +19,7 @@
 %hook MRNowPlayingFrontScreen
 
 // A fake audio player that reflects the state of the remote audio
-AVAudioPlayer *audioPlayer;
+AVAudioPlayer *audioPlayer = nil;
 
 /*
  * Hook view loading to initialize a fake audio player (required to recieve remote events)
@@ -33,18 +33,21 @@ AVAudioPlayer *audioPlayer;
     NSURL *dummyAudio = [[NSBundle mainBundle] URLForResource:@"Robot" withExtension:@"m4r"];
     NSError *error;
 
-    audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:dummyAudio error:&error];
-    [audioPlayer setNumberOfLoops:-1];
- 
-    if (error)
+    if (!audioPlayer)
     {
-        NSLog(@"%@", [error localizedDescription]);
-        return;
-    }
+        audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:dummyAudio error:&error];
+        [audioPlayer setNumberOfLoops:-1];
 
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-    [[AVAudioSession sharedInstance] setActive:YES error:nil];
-    [audioPlayer prepareToPlay];
+        if (error)
+        {
+            NSLog(@"%@", [error localizedDescription]);
+            return;
+        }
+
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        [audioPlayer prepareToPlay];
+    }
 }
 
 /*
