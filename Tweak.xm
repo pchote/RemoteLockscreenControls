@@ -21,12 +21,18 @@
 // A fake audio player that reflects the state of the remote audio
 AVAudioPlayer *audioPlayer = nil;
 
+// A dictionary of song info to display on the lock screen and media tray
+NSMutableDictionary *nowPlayingDict = nil;
+
 /*
  * Hook view loading to initialize a fake audio player (required to recieve remote events)
  */
 - (void)viewDidLoad
 {
     %orig;
+
+    if (!nowPlayingDict)
+        nowPlayingDict = [[NSMutableDictionary alloc] init];
 
     // TODO: Make this work without an audio file.
     // For now, it expects Robot.m4r in the Remote.app bundle
@@ -56,22 +62,35 @@ AVAudioPlayer *audioPlayer = nil;
 -(void)updateTrackInfo
 {
     %orig;
-    RCDAAPItem *song = [[self remote] currentSong];
 
-    NSMutableDictionary *nowPlayingInfo = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [song name], MPMediaItemPropertyTitle,
-        [song songalbum], MPMediaItemPropertyAlbumTitle,
-        [song songalbumartist], MPMediaItemPropertyArtist,
-    nil] autorelease];
+    RCDAAPItem *song = [[self remote] currentSong];
+    if ([song name])
+        [nowPlayingDict setObject:[song name] forKey:MPMediaItemPropertyTitle];
+    if ([song songalbum])
+        [nowPlayingDict setObject:[song songalbum] forKey:MPMediaItemPropertyAlbumTitle];
+    if ([song songartist])
+        [nowPlayingDict setObject:[song songartist] forKey:MPMediaItemPropertyArtist];
+    if ([song songalbumartist])
+        [nowPlayingDict setObject:[song songalbumartist] forKey:MPMediaItemPropertyAlbumArtist];
+
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:nowPlayingDict];
+}
+
+/*
+ * Hook album art update to update the "now playing info" dict
+ */
+-(void)updateArt
+{
+    %orig;
 
     UIImage *albumImage = [[self albumArt] image];
-    if (albumImage)
-    {
-        MPMediaItemArtwork *albumArtwork = [[[MPMediaItemArtwork alloc] initWithImage:albumImage] autorelease];
-        [nowPlayingInfo setObject:albumArtwork forKey:MPMediaItemPropertyArtwork];
-    }
+    if (!albumImage)
+        return;
 
-    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:nowPlayingInfo];
+    MPMediaItemArtwork *albumArtwork = [[[MPMediaItemArtwork alloc] initWithImage:albumImage] autorelease];
+    [nowPlayingDict setObject:albumArtwork forKey:MPMediaItemPropertyArtwork];
+
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:nowPlayingDict];
 }
 
 /*
