@@ -1,0 +1,9 @@
+Package: net.chote.paul.remotelockscreencontrols
+Name: Remote Lockscreen Controls
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Enable the system media controls in the multitasking tray and lock screen for Apple's Remote.app
+Maintainer: Paul Chote
+Author: Paul Chote
+Section: Tweaks
