@@ -53,6 +53,7 @@ NSMutableDictionary *nowPlayingDict = nil;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         [[AVAudioSession sharedInstance] setActive:YES error:nil];
         [audioPlayer prepareToPlay];
+        [audioPlayer pause];
     }
 }
 
@@ -117,17 +118,17 @@ NSMutableDictionary *nowPlayingDict = nil;
 }
 
 /*
- * Hook the play/pause button press action to toggle our fake audio player
+ * Hook the button state change to toggle the fake player
  * (the system play/pause state is based off the state of the fake player)
  */
--(void)onPlay:(id)play
+-(void)setPlayButtonIsPlaying:(BOOL)playing
 {
-    if (![[self remote] isPlaying])
+    %orig;
+
+    if (playing)
         [audioPlayer play];
     else
         [audioPlayer pause];
-
-    %orig;
 }
 
 /*
