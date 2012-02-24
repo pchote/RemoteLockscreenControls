@@ -6,7 +6,7 @@
  */
 
 // Dumped from Remote.app with class-dump-z
-#import "MRPlayerScreenBase.h"
+#import "MRNowPlayingFrontScreen.h"
 #import "RCiTunesPlayer.h"
 #import "RCDAAPItem.h"
 
@@ -16,7 +16,7 @@
 #import <MediaPlayer/MPNowPlayingInfoCenter.h>
 #import <MediaPlayer/MPMediaItem.h>
 
-%hook MRPlayerScreenBase
+%hook MRNowPlayingFrontScreen
 
 // A fake audio player that reflects the state of the remote audio
 AVAudioPlayer *audioPlayer;
@@ -53,13 +53,20 @@ AVAudioPlayer *audioPlayer;
 -(void)updateTrackInfo
 {
     %orig;
+    RCDAAPItem *song = [[self remote] currentSong];
 
-    NSDictionary *songInfo = [[[self remote] currentSong] dictionaryRepresentation];
-    NSDictionary *nowPlayingInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-        [songInfo objectForKey:@"name"], MPMediaItemPropertyTitle,
-        [songInfo objectForKey:@"songalbum"], MPMediaItemPropertyAlbumTitle,
-        [songInfo objectForKey:@"songartist"], MPMediaItemPropertyArtist,
-        nil];
+    NSMutableDictionary *nowPlayingInfo = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+        [song name], MPMediaItemPropertyTitle,
+        [song songalbum], MPMediaItemPropertyAlbumTitle,
+        [song songalbumartist], MPMediaItemPropertyArtist,
+    nil] autorelease];
+
+    UIImage *albumImage = [[self albumArt] image];
+    if (albumImage)
+    {
+        MPMediaItemArtwork *albumArtwork = [[[MPMediaItemArtwork alloc] initWithImage:albumImage] autorelease];
+        [nowPlayingInfo setObject:albumArtwork forKey:MPMediaItemPropertyArtwork];
+    }
 
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:nowPlayingInfo];
 }
