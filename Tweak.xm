@@ -99,7 +99,7 @@ NSMutableDictionary *nowPlayingDict = nil;
  */
 - (void)viewDidAppear:(BOOL)animated
 {
-    %orig;
+    %orig(animated);
 
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self becomeFirstResponder];
@@ -114,7 +114,7 @@ NSMutableDictionary *nowPlayingDict = nil;
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     [self resignFirstResponder];
 
-    %orig;
+    %orig(animated);
 }
 
 /*
@@ -123,7 +123,7 @@ NSMutableDictionary *nowPlayingDict = nil;
  */
 -(void)setPlayButtonIsPlaying:(BOOL)playing
 {
-    %orig;
+    %orig(playing);
 
     if (playing)
         [audioPlayer play];
