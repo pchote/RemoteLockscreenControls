@@ -1,5 +1,5 @@
 export THEOS_DEVICE_IP=10.1.1.2
-SDKVERSION = 5.0
+SDKVERSION = 5.1
 include theos/makefiles/common.mk
 
 TWEAK_NAME = RemoteLockscreenControls
