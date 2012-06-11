@@ -34,21 +34,20 @@ NSMutableDictionary *nowPlayingDict = nil;
     if (!nowPlayingDict)
         nowPlayingDict = [[NSMutableDictionary alloc] init];
 
-    // TODO: Make this work without an audio file.
-    // For now, it expects Robot.m4r in the Remote.app bundle
-    NSURL *dummyAudio = [[NSBundle mainBundle] URLForResource:@"Robot" withExtension:@"m4r"];
-    NSError *error;
-
     if (!audioPlayer)
     {
+        // A system sound to run indefinitely at zero volume while the remote song is playing
+        NSURL *dummyAudio = [NSURL URLWithString:@"/System/Library/CoreServices/SpringBoard.app/ring.m4r"];
+        NSError *error;
         audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:dummyAudio error:&error];
-        [audioPlayer setNumberOfLoops:-1];
-
         if (error)
         {
             NSLog(@"%@", [error localizedDescription]);
             return;
         }
+
+        [audioPlayer setNumberOfLoops:-1];
+        [audioPlayer setVolume:0];
 
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         [[AVAudioSession sharedInstance] setActive:YES error:nil];
